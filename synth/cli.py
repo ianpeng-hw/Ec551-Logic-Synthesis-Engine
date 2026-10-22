@@ -17,6 +17,8 @@ from synth.truth_table import truthtable
 from synth.qm import PI, EPI, minimize_sop, minimize_pos, total_literals 
 from synth.hazard import find_hazardSOP, find_hazardPOS, describe_hazard  
 from synth.verilog_gen import generate_verilog 
+from synth.basys3filesgen import generate_basys3_files
+from synth.basys3filesgenauto import generate_basys3_auto_files
 
 from pathlib import Path
 
@@ -179,7 +181,7 @@ def run(initial_file: str | None = None) -> None:
         if command in ("quit", "exit"):
             break
         elif command == "help":
-            print ("Commands: help, quit, expr, loadoutputs, loadblif, sop, pos, invsop, invpos, offcount, oncount, truth, primeim, essentialpi, minsop, minpos")
+            print ("Commands: help, quit, expr, loadoutputs, loadblif, fpga, fpgaauto | Commands: sop, pos, invsop, invpos, offcount, oncount, truth, primeim, essentialpi, minsop, minpos")
 
 
        # This is for Boolean input
@@ -419,6 +421,56 @@ def run(initial_file: str | None = None) -> None:
                 try:
                     filepath = generate_verilog(current_function)
                     print("Structural Verilog generated:", filepath)
+                except (ValueError, OSError) as error:
+                    print("Error:", error)
+
+                    
+        # Generate all FPGA files for manual switch input
+        elif command == "fpga":
+            if current_function is None:
+                print("Please load a Boolean function first.")
+
+            else:
+                try:
+                    # generates structural Verilog
+                    verilog_path = generate_verilog(current_function)
+
+                    # generates FPGA wrapper and constraints
+                    top_path, xdc_path = generate_basys3_files(
+                        current_function
+                    )
+
+                    print("FPGA files generated successfully!")
+                    print("Structural Verilog:", verilog_path)
+                    print("Top-level wrapper:", top_path)
+                    print("Pin constraints:", xdc_path)
+
+                except (ValueError, OSError) as error:
+                    print("Error:", error)
+
+        # Generate Basys 3 automatic truth-table testing files
+        elif command == "fpgaauto":
+            if current_function is None:
+                print("Please load a Boolean function first.")
+
+            else:
+                try:
+                    # generates the automatic FPGA wrapper and constraints
+                    top_path, xdc_path = generate_basys3_auto_files(
+                        current_function
+                    )
+
+                    # generates structural Verilog for the same function
+                    verilog_path = generate_verilog(
+                        current_function,
+                        filepath="fpga/generated_logic_auto.v"
+                    )
+
+                    print("Automatic FPGA files generated successfully!")
+                    print("Structural Verilog:", verilog_path)
+                    print("Automatic wrapper:", top_path)
+                    print("Pin constraints:", xdc_path)
+
                 except (ValueError, OSError) as error:
                     print("Error:", error)
 
