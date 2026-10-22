@@ -1,17 +1,7 @@
 """
 blif_parser.py - Read a BLIF file into a BooleanFunction.
 
-Handles both kinds of input the assignment asks for:
-  * SOP:                 one .names block (each row is one product term)
-  * multi-level circuit: several .names blocks connected by internal signals
 
-Both are handled the same way: for every input combination we simulate the
-circuit, and the combinations where the output is 1 become the ON-set.
-
-Limits: combinational logic only (.latch / .subckt are not supported),
-exactly one output, and truth-table rows must end in 1.
-
-AI usage: written with help from Claude (Anthropic).
 """
 
 from synth.function import BooleanFunction, minterm_to_cube
