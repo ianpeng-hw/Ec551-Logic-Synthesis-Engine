@@ -10,6 +10,7 @@ verilog) once the operations are written.
 from __future__ import annotations
 
 from synth.parasesop import parseexpression, getvariables, minterms
+from synth.blif_parser import read_blif
 from synth.function import BooleanFunction, sop_to_string, pos_to_string
 from synth.canonical import canonicalpos, canonicalsop, inversecanonicalpos, inversecanonicalsop
 from synth.truth_table import truthtable
@@ -41,7 +42,7 @@ def run(initial_file: str | None = None) -> None:
         if command in ("quit", "exit"):
             break
         elif command == "help":
-            print ("Commands: help, quit, expr, sop, pos, invsop, invpos, offcount, oncount, truth, primeim, essentialpi, minsop, minpos")
+            print ("Commands: help, quit, expr, load, sop, pos, invsop, invpos, offcount, oncount, truth, primeim, essentialpi, minsop, minpos")
 
 
        # This is for Boolean input
@@ -80,6 +81,30 @@ def run(initial_file: str | None = None) -> None:
                 except ValueError as error:
                     print("Error:", error)
 
+        # This is for loading a BLIF file
+        elif command == "load":
+            parts = line.split(maxsplit=1)
+
+            # checks if the user entered a file path
+            if len(parts) == 1 or not parts[1].strip():
+                print("Please enter a BLIF file path.")
+
+            else:
+                filepath = parts[1].strip().strip('"')
+
+                # trys loading and processing the BLIF file
+                try:
+                    current_function = read_blif(filepath)
+
+                    print("BLIF circuit loaded successfully.")
+                    print("Variables:", current_function.var_names)
+                    print("Output:", current_function.output_name)
+                    print("ON-set:", sorted(current_function.on_set))
+                    print("OFF-set:", sorted(current_function.off_set()))
+
+                # catches missing files and invalid BLIF inputs
+                except (OSError, ValueError) as error:
+                    print("Error:", error)
 
         # 1. Canonical SOP
         elif command == "sop":
