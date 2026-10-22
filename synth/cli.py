@@ -18,6 +18,143 @@ from synth.qm import PI, EPI, minimize_sop, minimize_pos, total_literals
 from synth.hazard import find_hazardSOP, find_hazardPOS, describe_hazard  
 from synth.verilog_gen import generate_verilog 
 
+from pathlib import Path
+
+
+# This exports the complete Logic Synthesis Engine report (Used AI to compile all the outputs into one file)
+def export_report(f, filepath="reports/synthesis_report.txt"):
+
+    # minimized SOP and POS
+    sopcubes = minimize_sop(f)
+    poscubes = minimize_pos(f)
+
+    # Prime Implicants
+    primes = PI(f)
+    essentials = EPI(f)
+
+    # literal counts
+    n = len(f.var_names)
+
+    sopcanonicalcount = len(f.on_set) * n
+    poscanonicalcount = len(f.off_set()) * n
+
+    sopminimizedcount = total_literals(sopcubes)
+    posminimizedcount = total_literals(poscubes)
+
+    # Calculate hazards
+    sophazards = find_hazardSOP(f)
+    poshazards = find_hazardPOS(f)
+
+    # Store the report as a list of strings
+    lines = [
+        "EC551 LOGIC SYNTHESIS ENGINE REPORT",
+        "=" * 50,
+
+        "Variables: " + str(f.var_names),
+        "Output: " + f.output_name,
+        "ON-set: " + str(sorted(f.on_set)),
+        "OFF-set: " + str(sorted(f.off_set())),
+        "",
+
+        "1. CANONICAL SOP",
+        canonicalsop(f),
+        "",
+
+        "2. CANONICAL POS",
+        canonicalpos(f),
+        "",
+
+        "3. INVERSE CANONICAL SOP",
+        inversecanonicalsop(f),
+        "",
+
+        "4. INVERSE CANONICAL POS",
+        inversecanonicalpos(f),
+        "",
+
+        "5. MINIMIZED SOP",
+        sop_to_string(sopcubes, f.var_names),
+        "Canonical literals: " + str(sopcanonicalcount),
+        "Minimized literals: " + str(sopminimizedcount),
+        "Literals saved: " + str(
+            sopcanonicalcount - sopminimizedcount
+        ),
+        "",
+
+        "6. MINIMIZED POS",
+        pos_to_string(poscubes, f.var_names),
+        "Canonical literals: " + str(poscanonicalcount),
+        "Minimized literals: " + str(posminimizedcount),
+        "Literals saved: " + str(
+            poscanonicalcount - posminimizedcount
+        ),
+        "",
+
+        "7. PRIME IMPLICANTS",
+        sop_to_string(primes, f.var_names),
+        "Count: " + str(len(primes)),
+        "",
+
+        "8. ESSENTIAL PRIME IMPLICANTS",
+        sop_to_string(essentials, f.var_names),
+        "Count: " + str(len(essentials)),
+        "",
+
+        "9. ON-SET COUNT",
+        str(len(f.on_set)),
+        "",
+
+        "10. OFF-SET COUNT",
+        str(len(f.off_set())),
+        "",
+
+        "11. HAZARD DETECTION",
+        "SOP Static-1 Hazards:"
+    ]
+
+    # adds the detected SOP hazards
+    if sophazards:
+        for hazard in sophazards:
+            lines.append(describe_hazard(hazard, f.var_names))
+    else:
+        lines.append("No hazards detected.")
+
+    # adds the detected POS hazards
+    lines.append("POS Static-0 Hazards:")
+
+    if poshazards:
+        for hazard in poshazards:
+            lines.append(describe_hazard(hazard, f.var_names))
+    else:
+        lines.append("No hazards detected.")
+
+    # adds the truth table
+    lines.extend([
+        "",
+        "12. TRUTH TABLE",
+        truthtable(f),
+        ""
+    ])
+
+    # generates structural Verilog
+    verilogpath = generate_verilog(f)
+
+    lines.extend([
+        "STRUCTURAL VERILOG",
+        str(verilogpath),
+        "",
+        verilogpath.read_text(encoding="utf-8")
+    ])
+
+    # creates the report directory if needed
+    target = Path(filepath)
+    target.parent.mkdir(parents=True, exist_ok=True)
+
+    # writes the report into the output file
+    target.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    return target
+
 def run(initial_file: str | None = None) -> None:
     
     """Read commands from the user until 'quit'."""
@@ -42,7 +179,7 @@ def run(initial_file: str | None = None) -> None:
         if command in ("quit", "exit"):
             break
         elif command == "help":
-            print ("Commands: help, quit, expr, load, sop, pos, invsop, invpos, offcount, oncount, truth, primeim, essentialpi, minsop, minpos")
+            print ("Commands: help, quit, expr, loadoutputs, loadblif, sop, pos, invsop, invpos, offcount, oncount, truth, primeim, essentialpi, minsop, minpos")
 
 
        # This is for Boolean input
@@ -82,7 +219,7 @@ def run(initial_file: str | None = None) -> None:
                     print("Error:", error)
 
         # This is for loading a BLIF file
-        elif command == "load":
+        elif command == "loadblif":
             parts = line.split(maxsplit=1)
 
             # checks if the user entered a file path
@@ -104,6 +241,27 @@ def run(initial_file: str | None = None) -> None:
 
                 # catches missing files and invalid BLIF inputs
                 except (OSError, ValueError) as error:
+                    print("Error:", error)
+        
+        # exports the complete synthesis report to a text file
+        elif command == "loadoutputs":
+            if current_function is None:
+                print("Please load an expression first using expr or load.")
+
+            else:
+                parts = line.split(maxsplit=1)
+
+                # uses a default filename if none is provided
+                if len(parts) == 1:
+                    filepath = "reports/synthesisreport.txt"
+                else:
+                    filepath = parts[1].strip().strip('"')
+
+                try:
+                    output_file = export_report(current_function, filepath)
+                    print("Full synthesis report saved to:", output_file)
+
+                except (ValueError, OSError) as error:
                     print("Error:", error)
 
         # 1. Canonical SOP

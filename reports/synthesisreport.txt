@@ -1,0 +1,76 @@
+EC551 LOGIC SYNTHESIS ENGINE REPORT
+==================================================
+Variables: ['A', 'B', 'C']
+Output: F
+ON-set: [2, 3, 5, 7]
+OFF-set: [0, 1, 4, 6]
+
+1. CANONICAL SOP
+A'BC' + A'BC + AB'C + ABC
+
+2. CANONICAL POS
+(A + B + C)(A + B + C')(A' + B + C)(A' + B' + C)
+
+3. INVERSE CANONICAL SOP
+A'B'C' + A'B'C + AB'C' + ABC'
+
+4. INVERSE CANONICAL POS
+(A + B' + C)(A + B' + C')(A' + B + C')(A' + B' + C')
+
+5. MINIMIZED SOP
+A'B + AC
+Canonical literals: 12
+Minimized literals: 4
+Literals saved: 8
+
+6. MINIMIZED POS
+(A + B)(A' + C)
+Canonical literals: 12
+Minimized literals: 4
+Literals saved: 8
+
+7. PRIME IMPLICANTS
+BC + A'B + AC
+Count: 3
+
+8. ESSENTIAL PRIME IMPLICANTS
+A'B + AC
+Count: 2
+
+9. ON-SET COUNT
+4
+
+10. OFF-SET COUNT
+4
+
+11. HAZARD DETECTION
+SOP Static-1 Hazards:
+A changes while B=1, C=1  (m3 <-> m7)
+POS Static-0 Hazards:
+A changes while B=0, C=0  (m0 <-> m4)
+
+12. TRUTH TABLE
+m | A B C | F
+-------------
+0 | 0 0 0 | 0
+1 | 0 0 1 | 0
+2 | 0 1 0 | 1
+3 | 0 1 1 | 1
+4 | 1 0 0 | 0
+5 | 1 0 1 | 1
+6 | 1 1 0 | 0
+7 | 1 1 1 | 1
+
+STRUCTURAL VERILOG
+fpga\generated_logic.v
+
+module structurallogic(A, B, C, F);
+    input A, B, C;
+    output F;
+    wire not_A, term_0, term_1;
+    not (not_A, A);
+    and (term_0, not_A, B);
+    and (term_1, A, C);
+    or (F, term_0, term_1);
+endmodule
+

@@ -1,9 +1,9 @@
-module structurallogic(A, B, C, D, E, G, F);
-    input A, B, C, D, E, G;
+module structurallogic(A, B, C, F);
+    input A, B, C;
     output F;
-    wire term_0, term_1, term_2;
-    and (term_0, E, G);
-    and (term_1, C, D);
-    and (term_2, A, B);
-    or (F, term_0, term_1, term_2);
+    wire not_A, term_0, term_1;
+    not (not_A, A);
+    and (term_0, not_A, B);
+    and (term_1, A, C);
+    or (F, term_0, term_1);
 endmodule
