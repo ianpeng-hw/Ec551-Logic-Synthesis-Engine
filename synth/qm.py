@@ -16,10 +16,10 @@ def merge(a, b):
         return result
     return None
 
-def is_covered(a, b, cubes):
-    """True if ONE cube in cubes covers both a and b."""
+def is_covered(m, cubes):
+    """True if any cube in cubes covers minterm m."""
     for c in cubes:
-        if cube_covers(c, a) and cube_covers(c, b):
+        if cube_covers(c, m):
             return True
     return False
 
