@@ -17,9 +17,9 @@ def adjacent(minterms, n):
 
 
 def is_covered(a, b, cubes):
-    """True if any cube in cubes covers minterm a or b."""
+    """True if any cube in cubes covers minterm a and b"""
     for c in cubes:
-        if cube_covers(c, a) or cube_covers(c, b):
+        if cube_covers(c, a) and cube_covers(c, b):
             return True
     return False
 
