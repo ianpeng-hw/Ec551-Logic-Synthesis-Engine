@@ -203,7 +203,7 @@ def run(initial_file: str | None = None) -> None:
                     current_function = BooleanFunction(
                         var_names=variables,
                         on_set=minterm,
-                        output_name="F"
+                        output_name="out"
                     )
 
                     print("Variables:", current_function.var_names)
