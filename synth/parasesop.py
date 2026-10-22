@@ -2,16 +2,54 @@
 parasesop.py - Seperates SOP expression into product form
 
 """
-from synth.function import BooleanFunction
 
 def parsesop(expression):
-    # Splits the terms in the boolean expression at the +
-    terms = expression.split("+")
+
+    # convert to uppercase and split at +
+    terms = expression.upper().split("+")
     cleanedterms = []
 
-    # Cleans up white space in each term
     for term in terms:
         newterm = term.strip()
+
+        # check for empty product terms
+        if not newterm:
+            raise ValueError("Invalid SOP: empty product term.")
+
+        # check for whitespace between variables
+        if any(char.isspace() for char in newterm):
+            raise ValueError("Invalid SOP: spaces between variables are not allowed.")
+
+        seen = set()
+
+        # check every character
+        for i, char in enumerate(newterm):
+
+            # accept variables A-Z
+            if char in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+
+                # reject repeated variables
+                if char in seen:
+                    raise ValueError(
+                        f"Invalid SOP: repeated variable {char}."
+                    )
+
+                seen.add(char)
+
+            # check for apostrophes
+            elif char == "'":
+
+                if i == 0 or newterm[i - 1] not in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+                    raise ValueError(
+                        f"Invalid SOP: misplaced apostrophe in {newterm}."
+                    )
+
+            # reject unsupported characters
+            else:
+                raise ValueError(
+                    f"Invalid SOP: character '{char}' is not allowed."
+                )
+
         cleanedterms.append(newterm)
 
     return cleanedterms
