@@ -1,7 +1,8 @@
 
+# Gen with AI, to figure out way to write the top and basys3.xdc files w Python
 from pathlib import Path
 
-# Official Basys 3 switch pins, from SW0 to SW15
+# official Basys 3 switch pins, from SW0 to SW15
 SWITCH_PINS = [
     "V17", "V16", "W16", "W17",
     "W15", "V15", "W14", "W13",
@@ -9,10 +10,10 @@ SWITCH_PINS = [
     "W2", "U1", "T1", "R2"
 ]
 
-# Seven-segment display pins, segments A through G
+# seven-segment display pins, segments A through G
 SEGMENT_PINS = ["W7", "W6", "U8", "V8", "U5", "V5", "U7"]
 
-# Digit enable pins, AN0 through AN3
+# digit enable pins, AN0 through AN3
 DIGIT_PINS = ["U2", "U4", "V4", "W4"]
 
 
@@ -22,19 +23,19 @@ def generate_basys3_files(f, folder="fpga"):
     output_name = f.output_name
     n = len(variables)
 
-    # Basys 3 supports up to 16 switch inputs
+    # basys 3 supports up to 16 switch inputs
     if n < 1 or n > 16:
         raise ValueError("Basys 3 supports 1 to 16 switch inputs.")
 
     if output_name in variables:
         raise ValueError("Output name conflicts with an input variable.")
 
-    # Create output folder
+    # creates output folder
     folder = Path(folder)
     folder.mkdir(parents=True, exist_ok=True)
 
     # ==========================================
-    # Generate top.v
+    # Generates top.v
     # ==========================================
 
     top_lines = [
@@ -52,11 +53,11 @@ def generate_basys3_files(f, folder="fpga"):
         "    structurallogic u_logic ("
     ]
 
-    # Connect each variable to a corresponding switch
+    # connects each variable to a corresponding switch
     for i, variable in enumerate(variables):
         top_lines.append(f"        .{variable}(sw[{i}]),")
 
-    # Connect circuit output to internal wire
+    # connects circuit output to internal wire
     top_lines.append(f"        .{output_name}(logic_out)")
     top_lines.append("    );")
 
@@ -91,7 +92,7 @@ def generate_basys3_files(f, folder="fpga"):
         "# Input switches"
     ]
 
-    # Assign each switch to its physical FPGA pin
+    # assigns each switch to its physical FPGA pin
     for i in range(n):
         pin = SWITCH_PINS[i]
 
@@ -100,7 +101,7 @@ def generate_basys3_files(f, folder="fpga"):
             f"IOSTANDARD LVCMOS33 }} [get_ports {{sw[{i}]}}]"
         )
 
-    # Output LED
+    # output LED
     xdc_lines.extend([
         "",
         "# LED0",
