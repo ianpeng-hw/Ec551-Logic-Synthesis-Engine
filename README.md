@@ -363,17 +363,14 @@ edited and tested all of this code and can explain every part of it.
     adding one prime implicant that covers both minterms of an uncovered
     adjacent pair, and corrected our version (it used `or` instead of `and` and
     added duplicate terms).
-  - `hazard.py`, `hazard_free_pos()`: Claude explained that POS cubes are cubes
-    of F', so the extra terms must come from the prime implicants of F' rather
-    than F, and corrected our version.
+  - `hazard.py`, `hazard_free_pos()`: Claude explained that the extra terms
+    must come from the prime implicants of F', and corrected our version.
   - `hazard.py`, `describe_hazard()`: Claude wrote this function, which turns a
     hazard into readable text.
-  - `blif_parser.py`: Claude wrote this file and explained its logic: evaluate
-    the circuit for every input combination, computing each gate once all of
-    its inputs are known, so a single-block SOP and a multi-level circuit go
-    through the same code.
+  - `blif_parser.py`: written by Claude; we reviewed and tested it and can
+    explain how it works.
   - This README was drafted with Claude.
-- <!-- TODO (partner): which AI tool you used -->: `basys3filesgen.py`,
+- "Place you need to fill"<!-- TODO (partner): which AI tool you used -->:"" `basys3filesgen.py`,
   `basys3filesgenauto.py`, and the report export and hazard command in
   `cli.py` (marked with comments in the code).
 - <!-- TODO (partner): confirm whether AI was used in canonical.py, parasesop.py, truth_table.py and verilog_gen.py -->
