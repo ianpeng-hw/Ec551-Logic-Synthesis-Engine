@@ -370,10 +370,26 @@ edited and tested all of this code and can explain every part of it.
   - `blif_parser.py`: written by Claude; we reviewed and tested it and can
     explain how it works.
   - This README was drafted with Claude.
-- "Place you need to fill"<!-- TODO (partner): which AI tool you used -->:"" `basys3filesgen.py`,
-  `basys3filesgenauto.py`, and the report export and hazard command in
-  `cli.py` (marked with comments in the code).
-- <!-- TODO (partner): confirm whether AI was used in canonical.py, parasesop.py, truth_table.py and verilog_gen.py -->
+- **ChatGPT (OpenAI)**, used by Aoke Huang. These parts are marked with
+  comments in the code.
+  - `basys3filesgen.py`: ChatGPT helped write the Python function that
+    automatically generates the Basys 3 top-level Verilog wrapper (`top.v`)
+    and pin constraints (`basys3.xdc`) based on the number of Boolean input
+    variables. We reviewed and tested the generated files using Vivado and the
+    Basys 3 FPGA.
+  - `basys3filesgenauto.py`: ChatGPT helped create the automatic FPGA file
+    generator, including the top-level wrapper for manual and automatic
+    truth-table testing, clock-based counting, and switch, LED, and
+    seven-segment display mappings.
+  - `cli.py` (report export): ChatGPT helped implement the command that exports
+    the synthesis results to a text file, including canonical and minimized
+    expressions, prime implicants, literal counts, hazard information, truth
+    tables, and structural Verilog.
+  - `cli.py` (hazard command): ChatGPT helped integrate the existing
+    hazard-detection functions into the command-line interface so users can
+    display potential static-1 and static-0 hazards.
+  - We reviewed, edited, and tested the AI-assisted code and integrated it with
+    the rest of our Logic Synthesis Engine.
 
 ## API
 
@@ -410,12 +426,11 @@ print(sop_to_string(minimize_sop(f), f.var_names))   # A'B + AC
 ## Maintainers
 
 - Ian Peng ([@ianpeng-hw](https://github.com/ianpeng-hw))
-- <!-- TODO: partner's name --> ([@ahc9701-wq](https://github.com/ahc9701-wq))
+- Aoke Huang ([@ahc9701-wq](https://github.com/ahc9701-wq))
 
 ## Thanks
 
-Thanks to Prof. Douglas Densmore and the EC551 teaching staff for the assignment
-and guidance.
+Thanks to Prof. Douglas Densmore for the assignment and guidance.
 
 ## Contributing
 
