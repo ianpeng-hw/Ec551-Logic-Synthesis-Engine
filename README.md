@@ -438,9 +438,6 @@ This is a course project, so we are not accepting outside contributions. Within
 the team we each own separate files, pull before starting work, and push to
 `main` (larger features go through pull requests).
 
-If editing this README, please follow the
-[standard-readme](https://github.com/RichardLitt/standard-readme) specification.
-
 ## License
 
 Coursework for EC551 at Boston University, Fall 2026. No open-source license is
